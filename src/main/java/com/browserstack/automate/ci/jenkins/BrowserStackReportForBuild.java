@@ -223,7 +223,7 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
             bstackDir.mkdirs();
             FilePath dst = bstackDir.child("buildResults.json");
             // result.copyTo(dst);
-            mapper.writeValue(Paths.get(dst.toURI()).toFile(), result);
+            mapper.writeValue(Paths.get(dst.toURI()).toFile(), getResult());
         } catch (Exception e) {
             e.printStackTrace();
         }
