@@ -10,11 +10,17 @@ import com.browserstack.automate.model.Build;
 import com.browserstack.automate.model.Session;
 import com.browserstack.client.BrowserStackClient;
 import com.browserstack.client.exception.BrowserStackException;
+
+import hudson.FilePath;
 import hudson.model.Run;
 import org.json.JSONObject;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.annotation.Nonnull;
+
 import java.io.PrintStream;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -109,6 +115,7 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
             if (result.size() > 0) {
                 result.sort(new SessionsSortingComparator());
                 generateAggregationInfo();
+                writeBuildResultToFile(getBuild());
                 return true;
             }
             return false;
@@ -207,6 +214,19 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
         resultAggregation.put("totalSessions", String.valueOf(totalSessions));
         resultAggregation.put("totalErrors", String.valueOf(totalErrors));
         resultAggregation.put("buildDuration", Tools.durationToHumanReadable(browserStackBuild.getDuration()));
+    }
+
+    private void writeBuildResultToFile(Run<?, ?> build) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            FilePath bstackDir = Tools.getBrowserStackReportDir(build, "browserstack-reports");
+            bstackDir.mkdirs();
+            FilePath dst = bstackDir.child("buildResults.json");
+            // result.copyTo(dst);
+            mapper.writeValue(Paths.get(dst.toURI()).toFile(), result);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public List<JSONObject> getResult() {
