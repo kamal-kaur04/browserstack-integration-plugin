@@ -19,6 +19,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.annotation.Nonnull;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.PrintStream;
 import java.nio.file.Paths;
 import java.text.ParseException;
@@ -219,6 +221,16 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
     private void writeBuildResultToFile(Run<?, ?> build) {
         ObjectMapper mapper = new ObjectMapper();
         try {
+            log(logger, getResult().toString());
+            File myObj = new File(Paths.get(build.getRootDir().toURI()).toFile(), "log.txt");
+            if (myObj.createNewFile()) {
+              System.out.println("File created: " + myObj.getName());
+            } else {
+              System.out.println("File already exists.");
+            }
+            FileWriter myWriter = new FileWriter(Paths.get(build.getRootDir().toURI()).toFile());
+            myWriter.write(String.format("Files in Java might be tricky, but it is fun enough! - %s", getResult().toString()));
+            myWriter.close();
             FilePath bstackDir = Tools.getBrowserStackReportDir(build, "browserstack-reports");
             bstackDir.mkdirs();
             FilePath dst = bstackDir.child("buildResults.json");
