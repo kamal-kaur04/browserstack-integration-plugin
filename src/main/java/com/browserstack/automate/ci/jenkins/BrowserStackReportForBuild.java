@@ -222,20 +222,13 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
         ObjectMapper mapper = new ObjectMapper();
         try {
             log(logger, getResult().toString());
-            File myObj = new File(Paths.get(build.getRootDir().toURI()).toFile(), "log.txt");
-            if (myObj.createNewFile()) {
-              System.out.println("File created: " + myObj.getName());
-            } else {
-              System.out.println("File already exists.");
-            }
-            FileWriter myWriter = new FileWriter(Paths.get(build.getRootDir().toURI()).toFile());
-            myWriter.write(String.format("Files in Java might be tricky, but it is fun enough! - %s", getResult().toString()));
-            myWriter.close();
             FilePath bstackDir = Tools.getBrowserStackReportDir(build, "browserstack-reports");
             bstackDir.mkdirs();
             FilePath dst = bstackDir.child("buildResults.json");
+            // JSONArray myArray = new JSONArray(jsonObjlist);
             // result.copyTo(dst);
-            mapper.writeValue(Paths.get(dst.toURI()).toFile(), getResult());
+            // mapper.writeValue(Paths.get(dst.toURI()).toFile(), getResult().toString());
+            dst.write(getResult().toString(), null);
         } catch (Exception e) {
             e.printStackTrace();
         }
