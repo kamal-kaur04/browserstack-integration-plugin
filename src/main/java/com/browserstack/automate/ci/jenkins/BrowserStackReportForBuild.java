@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
@@ -50,6 +51,7 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
     private final String failedConst = Constants.SessionStatus.FAILED;
     private transient Build browserStackBuild;
     private String browserStackBuildBrowserUrl;
+    private static final Logger LOGGER = Logger.getLogger(BrowserStackReportForBuild.class.getName());
 
     public BrowserStackReportForBuild(final Run<?, ?> build,
                                       final ProjectType projectType,
@@ -109,6 +111,7 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
     }
 
     public boolean generateBrowserStackReport() {
+        LOGGER.info("GENERATE BROWSERSTACK REPORT");
         if (result.size() == 0) {
             result.addAll(generateSessionsCollection(browserStackSessions));
 
@@ -118,6 +121,7 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
                 writeBuildResultToFile(getBuild());
                 return true;
             } else if (result.size() == 0 && parseStoredBuildResult(getBuild())) {
+                LOGGER.info("The result size is 0");
                 log(logger, "The result size is 0");
                 result.sort(new SessionsSortingComparator());
                 generateAggregationInfo();
@@ -238,7 +242,7 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
             log(logger, getResult().toString());
             FilePath bstackDir = Tools.getBrowserStackReportDir(build, "browserstack-reports");
             if (bstackDir.exists()) {
-                FilePath bstackReport = new FilePath(new File(bstackDir.getRemote(), "buildResults.json"));
+                FilePath bstackReport = new FilePath(new File(bstackDir.toURI().getPath(), "buildResults.json"));
                 if (bstackReport.exists()) {
                     InputStream inputStr = bstackReport.read();
                     ObjectInputStream readStream = new ObjectInputStream(inputStr);
@@ -251,7 +255,7 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
             }
             return false;
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info("GENERATE BROWSERSTACK REPORT " + e + "parseStoredBuildResult");
         }
         return true;
     }
