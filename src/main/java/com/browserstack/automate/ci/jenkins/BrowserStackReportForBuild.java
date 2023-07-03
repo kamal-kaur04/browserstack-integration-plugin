@@ -240,9 +240,9 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
     private boolean parseStoredBuildResult(Run<?, ?> build) {
         try {
             log(logger, getResult().toString());
-            FilePath bstackDir = Tools.getBrowserStackReportDir(build, "browserstack-reports");
+            File bstackDir = new File(build.getRootDir(), "browserstack-reports");
             if (bstackDir.exists()) {
-                FilePath bstackReport = new FilePath(new File(bstackDir.toURI().getPath(), "buildResults.json"));
+                FilePath bstackReport = new FilePath(new File(bstackDir.getAbsolutePath(), "buildResults.json"));
                 if (bstackReport.exists()) {
                     InputStream inputStr = bstackReport.read();
                     ObjectInputStream readStream = new ObjectInputStream(inputStr);
