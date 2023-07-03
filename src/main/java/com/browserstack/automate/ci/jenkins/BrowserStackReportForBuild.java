@@ -15,14 +15,12 @@ import hudson.FilePath;
 import hudson.model.Run;
 import org.json.JSONObject;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import javax.annotation.Nonnull;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.PrintStream;
-import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -118,6 +116,11 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
                 result.sort(new SessionsSortingComparator());
                 generateAggregationInfo();
                 writeBuildResultToFile(getBuild());
+                return true;
+            } else if (result.size() == 0 && parseStoredBuildResult(getBuild())) {
+                log(logger, "The result size is 0");
+                result.sort(new SessionsSortingComparator());
+                generateAggregationInfo();
                 return true;
             }
             return false;
@@ -219,19 +222,38 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
     }
 
     private void writeBuildResultToFile(Run<?, ?> build) {
-        ObjectMapper mapper = new ObjectMapper();
         try {
             log(logger, getResult().toString());
             FilePath bstackDir = Tools.getBrowserStackReportDir(build, "browserstack-reports");
             bstackDir.mkdirs();
             FilePath dst = bstackDir.child("buildResults.json");
-            // JSONArray myArray = new JSONArray(jsonObjlist);
-            // result.copyTo(dst);
-            // mapper.writeValue(Paths.get(dst.toURI()).toFile(), getResult().toString());
             dst.write(getResult().toString(), null);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean parseStoredBuildResult(Run<?, ?> build) {
+        try {
+            log(logger, getResult().toString());
+            FilePath bstackDir = Tools.getBrowserStackReportDir(build, "browserstack-reports");
+            if (bstackDir.exists()) {
+                FilePath bstackReport = new FilePath(new File(bstackDir.getRemote(), "buildResults.json"));
+                if (bstackReport.exists()) {
+                    InputStream inputStr = bstackReport.read();
+                    ObjectInputStream readStream = new ObjectInputStream(inputStr);
+
+                    List<JSONObject> parsedResult = (List<JSONObject>) readStream.readObject();
+                    result.addAll(parsedResult);
+                    readStream.close();
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 
     public List<JSONObject> getResult() {
