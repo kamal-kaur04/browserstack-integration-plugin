@@ -72,6 +72,7 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
         this.tracker = tracker;
         this.pipelineStatus = pipelineStatus;
         fetchBuildAndSessions();
+        LOGGER.info("Is it coming here multiple time ??");
     }
 
     private void fetchBuildAndSessions() {
