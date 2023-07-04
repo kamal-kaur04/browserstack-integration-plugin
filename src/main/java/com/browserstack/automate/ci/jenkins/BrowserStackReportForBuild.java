@@ -261,16 +261,24 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
     }
 
     @Override
-    public List<JSONObject> getResult() {
+    public Object getResult() {
+//        LOGGER.info(String.format("I'm here, trying to find results %s", result.size()));
+//        setBuild(super.run);
+//        if (result.size() == 0 && parseStoredBuildResult(super.run)) {
+//            LOGGER.info("The result size is 0");
+//            log(logger, "The result size is 0");
+//            result.sort(new SessionsSortingComparator());
+//            generateAggregationInfo();
+//        }
+//        return result;
         LOGGER.info(String.format("I'm here, trying to find results %s", result.size()));
-        setBuild(super.run);
-        if (result.size() == 0 && parseStoredBuildResult(super.run)) {
+        if (result.size() == 0 && parseStoredBuildResult(getBuild())) {
             LOGGER.info("The result size is 0");
             log(logger, "The result size is 0");
             result.sort(new SessionsSortingComparator());
             generateAggregationInfo();
         }
-        return result;
+        return null;
     }
 
     public List<JSONObject> getBrowserStackResult() {
