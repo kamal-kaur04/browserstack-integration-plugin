@@ -271,7 +271,7 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
 //            generateAggregationInfo();
 //        }
 //        return result;
-        LOGGER.info(String.format("I'm here, trying to find results %s", result.size()));
+        LOGGER.info(String.format("I'm here, trying to find results %s", result));
         if (result.size() == 0 && parseStoredBuildResult(super.run)) {
             LOGGER.info("The result size is 0");
             log(logger, "The result size is 0");
