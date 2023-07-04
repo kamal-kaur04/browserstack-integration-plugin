@@ -7,10 +7,13 @@ import hudson.tasks.test.AbstractTestResultAction;
 import jenkins.tasks.SimpleBuildStep;
 
 import java.io.Serializable;
+import java.util.logging.Logger;
 
 public abstract class AbstractBrowserStackReportForBuild extends AbstractTestResultAction
     implements Serializable, SimpleBuildStep.LastBuildAction {
     private Run<?, ?> build;
+    private static final Logger LOGGER = Logger.getLogger(AbstractBrowserStackReportForBuild.class.getName());
+
 
     @Override
     public String getIconFileName() {
@@ -19,11 +22,13 @@ public abstract class AbstractBrowserStackReportForBuild extends AbstractTestRes
 
     @Override
     public String getDisplayName() {
+        LOGGER.info("Inside getDisplayName");
         return Constants.BROWSERSTACK_REPORT_DISPLAY_NAME;
     }
 
     @Override
     public String getUrlName() {
+        LOGGER.info("Inside getUrlName");
         return Constants.BROWSERSTACK_REPORT_URL;
     }
 
