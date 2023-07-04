@@ -264,12 +264,12 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
     public List<JSONObject> getResult() {
         LOGGER.info(String.format("I'm here, trying to find results %s", result.size()));
         setBuild(super.run);
-        if (result.size() == 0 && parseStoredBuildResult(super.run)) {
-            LOGGER.info("The result size is 0");
-            log(logger, "The result size is 0");
-            result.sort(new SessionsSortingComparator());
-            generateAggregationInfo();
-        }
+//        if (result.size() == 0 && parseStoredBuildResult(super.run)) {
+//            LOGGER.info("The result size is 0");
+//            log(logger, "The result size is 0");
+//            result.sort(new SessionsSortingComparator());
+//            generateAggregationInfo();
+//        }
         return result;
     }
 
