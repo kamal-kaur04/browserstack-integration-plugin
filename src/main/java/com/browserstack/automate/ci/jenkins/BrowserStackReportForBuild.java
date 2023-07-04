@@ -261,7 +261,7 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
     }
 
     @Override
-    public List<JSONObject> getResult() {
+    public Object getResult() {
         LOGGER.info(String.format("I'm here, trying to find results %s", result.size()));
         setBuild(super.run);
 //        if (result.size() == 0 && parseStoredBuildResult(super.run)) {
@@ -270,7 +270,7 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
 //            result.sort(new SessionsSortingComparator());
 //            generateAggregationInfo();
 //        }
-        return result;
+        return null;
     }
 
     public List<JSONObject> getBrowserStackResult() {
