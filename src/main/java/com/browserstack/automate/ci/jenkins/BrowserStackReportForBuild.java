@@ -34,8 +34,8 @@ import static com.browserstack.automate.ci.common.logger.PluginLogger.logError;
 public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBuild {
     private final String buildName;
     private final transient List<Session> browserStackSessions;
-    private final transient List<JSONObject> result;
-    private final Map<String, String> resultAggregation;
+    private transient List<JSONObject> result;
+    private Map<String, String> resultAggregation;
     private final ProjectType projectType;
     private final transient PrintStream logger;
     private final String customProxy;
@@ -229,7 +229,6 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
 
     private boolean parseStoredBuildResult(Run<?, ?> build) {
         try {
-            log(logger, getBrowserStackResult().toString());
             File bstackDir = new File(build.getRootDir(), "browserstack-reports");
             if (bstackDir.exists()) {
                 FilePath bstackReport = new FilePath(new File(bstackDir.getAbsolutePath(), "buildResults.json"));
@@ -262,21 +261,17 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
 
     @Override
     public Object getResult() {
-//        LOGGER.info(String.format("I'm here, trying to find results %s", result.size()));
-//        setBuild(super.run);
-//        if (result.size() == 0 && parseStoredBuildResult(super.run)) {
-//            LOGGER.info("The result size is 0");
-//            log(logger, "The result size is 0");
-//            result.sort(new SessionsSortingComparator());
-//            generateAggregationInfo();
-//        }
-//        return result;
         LOGGER.info(String.format("I'm here, trying to find results %s", result));
-        if (result.size() == 0 && parseStoredBuildResult(super.run)) {
-            LOGGER.info("The result size is 0");
-            log(logger, "The result size is 0");
-            result.sort(new SessionsSortingComparator());
-            generateAggregationInfo();
+        if (result == null) {
+            LOGGER.info("The result size is null");
+            result = new ArrayList<>();
+            if (parseStoredBuildResult(super.run)) {
+                LOGGER.info(String.format("Parse successful %s", result));
+                resultAggregation = new HashMap<>();
+                result.sort(new SessionsSortingComparator());
+                generateAggregationInfo();
+                LOGGER.info(String.format("Aggregated Report Generated %s", result));
+            }
         }
         return null;
     }
