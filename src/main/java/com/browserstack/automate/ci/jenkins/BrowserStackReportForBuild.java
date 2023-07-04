@@ -316,11 +316,6 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
         return failedConst;
     }
 
-    @Override
-    public Collection<? extends Action> getProjectActions() {
-        return null;
-    }
-
     private static class SessionsSortingComparator implements Comparator<JSONObject> {
 
         @Override
