@@ -272,7 +272,7 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
 //        }
 //        return result;
         LOGGER.info(String.format("I'm here, trying to find results %s", result.size()));
-        if (result.size() == 0 && parseStoredBuildResult(getBuild())) {
+        if (result.size() == 0 && parseStoredBuildResult(super.run)) {
             LOGGER.info("The result size is 0");
             log(logger, "The result size is 0");
             result.sort(new SessionsSortingComparator());

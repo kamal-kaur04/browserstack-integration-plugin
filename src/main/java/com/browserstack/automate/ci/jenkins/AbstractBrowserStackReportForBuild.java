@@ -9,8 +9,7 @@ import jenkins.tasks.SimpleBuildStep;
 import java.io.Serializable;
 import java.util.logging.Logger;
 
-public abstract class AbstractBrowserStackReportForBuild extends AbstractTestResultAction
-    implements Serializable, SimpleBuildStep.LastBuildAction {
+public abstract class AbstractBrowserStackReportForBuild extends AbstractTestResultAction {
     private Run<?, ?> build;
     private static final Logger LOGGER = Logger.getLogger(AbstractBrowserStackReportForBuild.class.getName());
 
