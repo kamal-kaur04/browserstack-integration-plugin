@@ -3,8 +3,13 @@ package com.browserstack.automate.ci.jenkins;
 import com.browserstack.automate.ci.common.constants.Constants;
 import hudson.model.Action;
 import hudson.model.Run;
+import hudson.tasks.test.AbstractTestResultAction;
+import jenkins.tasks.SimpleBuildStep;
 
-public abstract class AbstractBrowserStackReportForBuild implements Action {
+import java.io.Serializable;
+
+public abstract class AbstractBrowserStackReportForBuild extends AbstractTestResultAction
+    implements Serializable, SimpleBuildStep.LastBuildAction {
     private Run<?, ?> build;
 
     @Override

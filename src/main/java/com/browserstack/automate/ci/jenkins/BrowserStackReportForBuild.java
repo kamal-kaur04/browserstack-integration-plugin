@@ -12,6 +12,7 @@ import com.browserstack.client.BrowserStackClient;
 import com.browserstack.client.exception.BrowserStackException;
 
 import hudson.FilePath;
+import hudson.model.Action;
 import hudson.model.Run;
 import org.json.JSONObject;
 
@@ -22,13 +23,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.PrintStream;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
@@ -120,12 +115,6 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
                 result.sort(new SessionsSortingComparator());
                 generateAggregationInfo();
                 writeBuildResultToFile(getBuild());
-                return true;
-            } else if (result.size() == 0 && parseStoredBuildResult(getBuild())) {
-                LOGGER.info("The result size is 0");
-                log(logger, "The result size is 0");
-                result.sort(new SessionsSortingComparator());
-                generateAggregationInfo();
                 return true;
             }
             return false;
@@ -228,11 +217,11 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
 
     private void writeBuildResultToFile(Run<?, ?> build) {
         try {
-            log(logger, getResult().toString());
+            log(logger, getBrowserStackResult().toString());
             FilePath bstackDir = Tools.getBrowserStackReportDir(build, "browserstack-reports");
             bstackDir.mkdirs();
             FilePath dst = bstackDir.child("buildResults.json");
-            dst.write(getResult().toString(), null);
+            dst.write(getBrowserStackResult().toString(), null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -240,7 +229,7 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
 
     private boolean parseStoredBuildResult(Run<?, ?> build) {
         try {
-            log(logger, getResult().toString());
+            log(logger, getBrowserStackResult().toString());
             File bstackDir = new File(build.getRootDir(), "browserstack-reports");
             if (bstackDir.exists()) {
                 FilePath bstackReport = new FilePath(new File(bstackDir.getAbsolutePath(), "buildResults.json"));
@@ -261,7 +250,29 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
         return true;
     }
 
-    public List<JSONObject> getResult() {
+    @Override
+    public int getFailCount() {
+        return 0;
+    }
+
+    @Override
+    public int getTotalCount() {
+        return 0;
+    }
+
+    @Override
+    public Object getResult() {
+        LOGGER.info("I'm here, trying to find results");
+        if (result.size() == 0 && parseStoredBuildResult(getBuild())) {
+            LOGGER.info("The result size is 0");
+            log(logger, "The result size is 0");
+            result.sort(new SessionsSortingComparator());
+            generateAggregationInfo();
+        }
+        return null;
+    }
+
+    public List<JSONObject> getBrowserStackResult() {
         return result;
     }
 
@@ -294,6 +305,11 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
 
     public String getFailedConst() {
         return failedConst;
+    }
+
+    @Override
+    public Collection<? extends Action> getProjectActions() {
+        return null;
     }
 
     private static class SessionsSortingComparator implements Comparator<JSONObject> {
