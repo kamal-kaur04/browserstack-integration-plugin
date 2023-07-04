@@ -14,6 +14,7 @@ import com.browserstack.client.exception.BrowserStackException;
 import hudson.FilePath;
 import hudson.model.Action;
 import hudson.model.Run;
+import hudson.tasks.test.TestResult;
 import org.json.JSONObject;
 
 import javax.annotation.Nonnull;
@@ -245,8 +246,8 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
             return false;
         } catch (Exception e) {
             LOGGER.info("GENERATE BROWSERSTACK REPORT " + e + "parseStoredBuildResult");
+            return false;
         }
-        return true;
     }
 
     @Override
@@ -260,7 +261,7 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
     }
 
     @Override
-    public Object getResult() {
+    public TestResult getResult() {
         LOGGER.info(String.format("I'm here, trying to find results %s", result));
         if (result == null) {
             LOGGER.info("The result size is null");
@@ -273,7 +274,8 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
                 LOGGER.info(String.format("Aggregated Report Generated %s", result));
             }
         }
-        return null;
+        BrowserStackResult bstackResult = new BrowserStackResult();
+        return bstackResult;
     }
 
     public List<JSONObject> getBrowserStackResult() {
