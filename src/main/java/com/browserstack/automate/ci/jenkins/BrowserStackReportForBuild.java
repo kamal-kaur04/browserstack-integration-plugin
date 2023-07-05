@@ -35,8 +35,8 @@ import static com.browserstack.automate.ci.common.logger.PluginLogger.logError;
 public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBuild {
     private final String buildName;
     private final transient List<Session> browserStackSessions;
-    private transient List<JSONObject> result;
-    private Map<String, String> resultAggregation;
+    private final transient List<JSONObject> result;
+    private final Map<String, String> resultAggregation;
     private final ProjectType projectType;
     private final transient PrintStream logger;
     private final String customProxy;
@@ -228,7 +228,8 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
         }
     }
 
-    private boolean parseStoredBuildResult(Run<?, ?> build) {
+    private List<JSONObject> parseStoredBuildResult(Run<?, ?> build) {
+        List<JSONObject> bstackResultList = new ArrayList<>(); 
         try {
             File bstackDir = new File(build.getRootDir(), "browserstack-reports");
             if (bstackDir.exists()) {
@@ -236,17 +237,16 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
                 if (bstackReport.exists()) {
                     InputStream inputStr = bstackReport.read();
                     ObjectInputStream readStream = new ObjectInputStream(inputStr);
-
                     List<JSONObject> parsedResult = (List<JSONObject>) readStream.readObject();
-                    result.addAll(parsedResult);
+                    bstackResultList.addAll(parsedResult);
                     readStream.close();
-                    return true;
+                    return bstackResultList;
                 }
             }
-            return false;
+            return bstackResultList;
         } catch (Exception e) {
             LOGGER.info("GENERATE BROWSERSTACK REPORT " + e + "parseStoredBuildResult");
-            return false;
+            return bstackResultList;
         }
     }
 
@@ -263,18 +263,18 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
     @Override
     public TestResult getResult() {
         LOGGER.info(String.format("I'm here, trying to find results %s", result));
+        BrowserStackResult bstackResult = new BrowserStackResult(result, resultAggregation);
         if (result == null) {
             LOGGER.info("The result size is null");
-            result = new ArrayList<>();
-            if (parseStoredBuildResult(super.run)) {
-                LOGGER.info(String.format("Parse successful %s", result));
-                resultAggregation = new HashMap<>();
-                result.sort(new SessionsSortingComparator());
+            List<JSONObject> resultList = parseStoredBuildResult(super.run);
+            if (resultList != null && resultList.size() > 0) {
+                LOGGER.info(String.format("Parse successful %s", resultList));
+                resultList.sort(new SessionsSortingComparator());
                 generateAggregationInfo();
-                LOGGER.info(String.format("Aggregated Report Generated %s", result));
+                LOGGER.info(String.format("Aggregated Report Generated %s", resultList));
+                bstackResult = new BrowserStackResult(resultList, resultAggregation);
             }
         }
-        BrowserStackResult bstackResult = new BrowserStackResult();
         return bstackResult;
     }
 
