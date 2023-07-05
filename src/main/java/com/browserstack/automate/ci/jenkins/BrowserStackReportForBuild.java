@@ -244,9 +244,9 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
             FilePath bstackDir = Tools.getBrowserStackReportDir(build, "browserstack-reports");
             bstackDir.mkdirs();
             FilePath dst = bstackDir.child("buildResults.json");
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("results", getBrowserStackResult());
-            dst.write(jsonObject.toString(), null);
+            // JSONObject jsonObject = new JSONObject();
+            // jsonObject.put("results", getBrowserStackResult());
+            dst.write(getBrowserStackResult().toString(), null);
         } catch (Exception e) {
             e.printStackTrace();
         }
