@@ -243,18 +243,23 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
     private List<JSONObject> parseStoredBuildResult(Run<?, ?> build) {
         List<JSONObject> bstackResultList = new ArrayList<>(); 
         try {
-            FilePath bstackDir = Tools.getBrowserStackReportDir(owner, "browserstack-reports");
+            FilePath bstackDir = Tools.getBrowserStackReportDir(build, "browserstack-reports");
             FilePath[] paths = null;
+            LOGGER.info("bstackDir " + bstackDir);
 
             try {
                 paths = bstackDir.list("buildResults*.json");
+                LOGGER.info("paths " + paths.toString());
             } catch (Exception e) {
-                // do nothing
+                e.printStackTrace();
+                LOGGER.info("GENERATE BROWSERSTACK REPORT " + e + "bstackDir list");
             }
 
             if (paths != null) {
                 for (FilePath path : paths) {
+                    LOGGER.info("path " + path);
                     File file = new File(path.getRemote());
+                    LOGGER.info("File Path " + file.getAbsolutePath() + file.isFile());
                     
                     if (!file.isFile()) {
                         continue; // move to next file
@@ -273,7 +278,8 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
                         readStream.close();
                         return bstackResultList;
                     } catch (Exception e) {
-                        // TODO: handle exception
+                        e.printStackTrace();
+                        LOGGER.info("GENERATE BROWSERSTACK REPORT " + e + "bufferedInputStream");
                     }
                 }
             }
