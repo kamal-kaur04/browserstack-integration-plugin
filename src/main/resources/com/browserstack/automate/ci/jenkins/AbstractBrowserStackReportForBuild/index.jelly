@@ -122,7 +122,7 @@
                             <th class="bstack-header">Duration</th>
                             <th class="bstack-header">Created At</th>
                         </tr>
-                        <j:forEach items="${it.result}" var="i">
+                        <j:forEach items="${it.result.result}" var="i">
                             <tr class="bstack-row">
                                 <td class="bstack-data session-name"><a href="${i.url}" target="_blank">${i.name}</a></td>
                                 <td class="bstack-data titlecase-data">
