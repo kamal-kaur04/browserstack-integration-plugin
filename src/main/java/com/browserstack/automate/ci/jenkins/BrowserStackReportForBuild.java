@@ -333,7 +333,6 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
             try {
                 if (resultList != null && resultList.size() > 0) {
                     LOGGER.info(String.format("Parse successful %s", resultList));
-                    resultList.sort(new SessionsSortingComparator());
                     result = resultList;
                     resultAggregation = new HashMap<>();
                     generateAggregationInfo();
