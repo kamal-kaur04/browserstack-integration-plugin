@@ -10,9 +10,14 @@ import com.browserstack.automate.model.Build;
 import com.browserstack.automate.model.Session;
 import com.browserstack.client.BrowserStackClient;
 import com.browserstack.client.exception.BrowserStackException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import hudson.FilePath;
 import hudson.model.Run;
+import net.sf.json.JSONArray;
+
+import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
 import javax.annotation.Nonnull;
@@ -20,8 +25,10 @@ import javax.annotation.Nonnull;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.*;
 import java.util.logging.Logger;
@@ -266,16 +273,21 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
                     } else {
                     }
 
-                    BufferedInputStream bufferedInputStream = null;
+                    // BufferedInputStream bufferedInputStream = null;
+                    ObjectMapper mapper = new ObjectMapper();
 
                     try {
-                        bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
-                        ObjectInputStream readStream = new ObjectInputStream(bufferedInputStream);
-                        List<JSONObject> parsedResult = (List<JSONObject>) readStream.readObject();
+                        InputStream is = new FileInputStream(file);
+                        String jsonTxt = IOUtils.toString(is, StandardCharsets.UTF_8);
+                        LOGGER.info("GENERATE BROWSERSTACK REPORT " + jsonTxt + "parseStoredBuildResult Passes");
+                        List<JSONObject> parsedResult = mapper.readValue(jsonTxt, new TypeReference<List<JSONObject>>(){});
+
                         LOGGER.info("GENERATE BROWSERSTACK REPORT " + parsedResult + "parseStoredBuildResult Passes");
+                        LOGGER.info("GENERATE BROWSERSTACK REPORT " + parsedResult.toString() + "parseStoredBuildResult Passes");
                         bstackResultList.addAll(parsedResult);
                         LOGGER.info("GENERATE BROWSERSTACK REPORT " + bstackResultList.toString() + "parseStoredBuildResult Passes");
-                        readStream.close();
+                        is.close();
+                        // readStream.close();
                         return bstackResultList;
                     } catch (Exception e) {
                         e.printStackTrace();
