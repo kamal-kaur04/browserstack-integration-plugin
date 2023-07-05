@@ -278,26 +278,21 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
                     } else {
                     }
 
-                    // BufferedInputStream bufferedInputStream = null;
-                    ObjectMapper mapper = new ObjectMapper();
-
                     try {
                         InputStream is = new FileInputStream(file);
                         String jsonTxt = IOUtils.toString(is, StandardCharsets.UTF_8);
-                        // JsonParser jsonParser = new JsonParser();
-                        // try {  
-                        //     JSONArray jsonarray = new JSONArray(jsonTxt);
-                        //     LOGGER.info("GENERATE BROWSERSTACK REPORT " + jsonarray + "parseStoredBuildResult jsonarray");
-                        // } catch (Exception e) {
-                        //     // TODO: handle exception
-                        // }
-                        JSONObject jsonObject = new JSONObject(jsonTxt);
-                        JSONArray parsedResult = (JSONArray) jsonObject.get("results");
-                        
-                        for (int i = 0; i < parsedResult.length(); i++) {
-                            JSONObject jsonobject = parsedResult.getJSONObject(i);
-                            bstackResultList.add(jsonobject);
+                        try {  
+                            JSONArray parsedResult = new JSONArray(jsonTxt);
+                            LOGGER.info("GENERATE BROWSERSTACK REPORT " + parsedResult + "parseStoredBuildResult jsonarray");
+                            for (int i = 0; i < parsedResult.length(); i++) {
+                                JSONObject jsonobject = parsedResult.getJSONObject(i);
+                                bstackResultList.add(jsonobject);
+                            }
+                        } catch (Exception e) {
+                            LOGGER.info("GENERATE BROWSERSTACK REPORT " + e + "parseStoredBuildResult jsonarray");
                         }
+                        // JSONObject jsonObject = new JSONObject(jsonTxt);
+                        // JSONArray parsedResult = (JSONArray) jsonObject.get("results");
                         is.close();
                         LOGGER.info("GENERATE BROWSERSTACK REPORT " + bstackResultList + "parseStoredBuildResult Passes");
                         return bstackResultList;
