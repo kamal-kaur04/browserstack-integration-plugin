@@ -286,13 +286,14 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
                             LOGGER.info("GENERATE BROWSERSTACK REPORT " + parsedResult + "parseStoredBuildResult jsonarray");
                             for (int i = 0; i < parsedResult.length(); i++) {
                                 JSONObject jsonobject = parsedResult.getJSONObject(i);
+                                String createdAtString = jsonobject.getString(Constants.SessionInfo.CREATED_AT);
+                                Date sessionCreatedAt = Tools.SESSION_DATE_FORMAT.parse(createdAtString);
+                                jsonobject.put(Constants.SessionInfo.CREATED_AT, sessionCreatedAt);
                                 bstackResultList.add(jsonobject);
                             }
                         } catch (Exception e) {
                             LOGGER.info("GENERATE BROWSERSTACK REPORT " + e + "parseStoredBuildResult jsonarray");
                         }
-                        // JSONObject jsonObject = new JSONObject(jsonTxt);
-                        // JSONArray parsedResult = (JSONArray) jsonObject.get("results");
                         is.close();
                         LOGGER.info("GENERATE BROWSERSTACK REPORT " + bstackResultList + "parseStoredBuildResult Passes");
                         return bstackResultList;
