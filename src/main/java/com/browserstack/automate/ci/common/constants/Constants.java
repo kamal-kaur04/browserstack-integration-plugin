@@ -20,6 +20,8 @@ public class Constants {
     // Session related info
     public static final class SessionInfo {
         public static final String NAME = "name";
+        public static final String BROWSERSTACK_BUILD_NAME = "buildName";
+        public static final String BROWSERSTACK_BUILD_URL = "buildUrl";
         public static final String BROWSER = "browser";
         public static final String OS = "os";
         public static final String STATUS = "status";

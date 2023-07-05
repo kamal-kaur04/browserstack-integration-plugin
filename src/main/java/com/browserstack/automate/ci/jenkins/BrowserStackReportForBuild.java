@@ -162,6 +162,9 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
             sessionJSON.put(Constants.SessionInfo.NAME, session.getName());
         }
 
+        sessionJSON.put(Constants.SessionInfo.BROWSERSTACK_BUILD_NAME, buildName);
+        sessionJSON.put(Constants.SessionInfo.BROWSERSTACK_BUILD_URL, browserStackBuildBrowserUrl);
+
         if (session.getDevice() == null || session.getDevice().isEmpty()) {
             sessionJSON.put(Constants.SessionInfo.BROWSER, session.getBrowser());
         } else {
@@ -216,6 +219,16 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
         resultAggregation.put("buildDuration", Tools.durationToHumanReadable(browserStackBuild.getDuration()));
     }
 
+    private String fetchBuildInfo(List<JSONObject> resultList) {
+        String buildName = "";
+        if (resultList.size() > 0) {
+            JSONObject resultObject = resultList.get(0);
+            browserStackBuildBrowserUrl = String.valueOf(resultObject.get(Constants.SessionInfo.BROWSERSTACK_BUILD_URL));
+            buildName = String.valueOf(resultObject.get(Constants.SessionInfo.BROWSERSTACK_BUILD_NAME));
+        }
+        return buildName;
+    }
+
     private void writeBuildResultToFile(Run<?, ?> build) {
         try {
             log(logger, getBrowserStackResult().toString());
@@ -261,9 +274,9 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
     }
 
     @Override
-    public TestResult getResult() {
+    public BrowserStackResult getResult() {
         LOGGER.info(String.format("I'm here, trying to find results %s", result));
-        BrowserStackResult bstackResult = new BrowserStackResult(result, resultAggregation);
+        BrowserStackResult bstackResult = new BrowserStackResult(buildName, browserStackBuildBrowserUrl, result, resultAggregation);
         bstackResult.setRun(getBuild());
         if (result == null) {
             LOGGER.info("The result size is null");
@@ -272,8 +285,9 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
                 LOGGER.info(String.format("Parse successful %s", resultList));
                 resultList.sort(new SessionsSortingComparator());
                 generateAggregationInfo();
+                String browserstackbuildName = fetchBuildInfo(resultList);
                 LOGGER.info(String.format("Aggregated Report Generated %s", resultList));
-                bstackResult = new BrowserStackResult(resultList, resultAggregation);
+                bstackResult = new BrowserStackResult(browserstackbuildName, browserStackBuildBrowserUrl, resultList, resultAggregation);
                 bstackResult.setRun(super.run);
             }
         }
