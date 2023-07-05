@@ -282,7 +282,6 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
                     try {
                         InputStream is = new FileInputStream(file);
                         String jsonTxt = IOUtils.toString(is, StandardCharsets.UTF_8);
-                        LOGGER.info("GENERATE BROWSERSTACK REPORT " + jsonTxt + "parseStoredBuildResult Passes");
                         // JsonParser jsonParser = new JsonParser();
                         // try {  
                         //     JSONArray jsonarray = new JSONArray(jsonTxt);
@@ -291,18 +290,14 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
                         //     // TODO: handle exception
                         // }
                         JSONObject jsonObject = new JSONObject(jsonTxt);
-                        LOGGER.info("GENERATE BROWSERSTACK REPORT " + jsonObject + "parseStoredBuildResult jsonObject");
-                        LOGGER.info("GENERATE BROWSERSTACK REPORT " + jsonObject.get("results") + "parseStoredBuildResult jsonObject");
                         JSONArray parsedResult = (JSONArray) jsonObject.get("results");
                         
                         for (int i = 0; i < parsedResult.length(); i++) {
                             JSONObject jsonobject = parsedResult.getJSONObject(i);
                             bstackResultList.add(jsonobject);
                         }
-                        LOGGER.info("GENERATE BROWSERSTACK REPORT " + parsedResult + "parseStoredBuildResult Passes");
-                        LOGGER.info("GENERATE BROWSERSTACK REPORT " + bstackResultList.toString() + "parseStoredBuildResult Passes Here");
                         is.close();
-                        // readStream.close();
+                        LOGGER.info("GENERATE BROWSERSTACK REPORT " + bstackResultList + "parseStoredBuildResult Passes");
                         return bstackResultList;
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -337,14 +332,18 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
         if (result == null) {
             LOGGER.info("The result size is null");
             List<JSONObject> resultList = parseStoredBuildResult(super.run);
-            if (resultList != null && resultList.size() > 0) {
-                LOGGER.info(String.format("Parse successful %s", resultList));
-                resultList.sort(new SessionsSortingComparator());
-                generateAggregationInfo();
-                String browserstackbuildName = fetchBuildInfo(resultList);
-                LOGGER.info(String.format("Aggregated Report Generated %s", resultList));
-                bstackResult = new BrowserStackResult(browserstackbuildName, browserStackBuildBrowserUrl, resultList, resultAggregation);
-                bstackResult.setRun(super.run);
+            try {
+                if (resultList != null && resultList.size() > 0) {
+                    LOGGER.info(String.format("Parse successful %s", resultList));
+                    resultList.sort(new SessionsSortingComparator());
+                    generateAggregationInfo();
+                    String browserstackbuildName = fetchBuildInfo(resultList);
+                    LOGGER.info(String.format("Aggregated Report Generated %s", resultList));
+                    bstackResult = new BrowserStackResult(browserstackbuildName, browserStackBuildBrowserUrl, resultList, resultAggregation);
+                    bstackResult.setRun(super.run);
+                }
+            } catch (Exception e) {
+                LOGGER.info(String.format("Exception in getResult %s", e));
             }
         }
         return bstackResult;
