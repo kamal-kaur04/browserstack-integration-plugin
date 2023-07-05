@@ -168,7 +168,7 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
 
         sessionJSON.put(Constants.SessionInfo.BROWSERSTACK_BUILD_NAME, buildName);
         sessionJSON.put(Constants.SessionInfo.BROWSERSTACK_BUILD_URL, browserStackBuildBrowserUrl);
-        sessionJSON.put(Constants.SessionInfo.BROWSERSTACK_BUILD_DURATION, browserStackBuild.getDuration());
+        sessionJSON.put(Constants.SessionInfo.BROWSERSTACK_BUILD_DURATION, String.valueOf(browserStackBuild.getDuration()));
 
         if (session.getDevice() == null || session.getDevice().isEmpty()) {
             sessionJSON.put(Constants.SessionInfo.BROWSER, session.getBrowser());
@@ -221,11 +221,11 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
 
         resultAggregation.put("totalSessions", String.valueOf(totalSessions));
         resultAggregation.put("totalErrors", String.valueOf(totalErrors));
-        // if (browserStackBuild == null && result.get(0).get(Constants.SessionInfo.BROWSERSTACK_BUILD_DURATION) != null) {
-        //     resultAggregation.put("buildDuration", Tools.durationToHumanReadable(Long.parseLong(String.valueOf(result.get(0).get(Constants.SessionInfo.BROWSERSTACK_BUILD_DURATION)))));
-        // } else {
+        if (browserStackBuild == null && result.get(0).get(Constants.SessionInfo.BROWSERSTACK_BUILD_DURATION) != null) {
+            resultAggregation.put("buildDuration", Tools.durationToHumanReadable(Long.parseLong(String.valueOf(result.get(0).get(Constants.SessionInfo.BROWSERSTACK_BUILD_DURATION)))));
+        } else {
             resultAggregation.put("buildDuration", Tools.durationToHumanReadable(browserStackBuild.getDuration()));
-        // }
+        }
     }
 
     private String fetchBuildInfo(List<JSONObject> resultList) {
@@ -343,6 +343,7 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
                 }
             } catch (Exception e) {
                 LOGGER.info(String.format("Exception in getResult %s", e));
+                LOGGER.info(String.format("Something went wrong - %s", Tools.getStackTraceAsString(e)));
             }
         }
         try {
