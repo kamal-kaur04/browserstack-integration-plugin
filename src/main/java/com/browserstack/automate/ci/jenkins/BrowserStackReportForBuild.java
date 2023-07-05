@@ -284,20 +284,23 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
                         String jsonTxt = IOUtils.toString(is, StandardCharsets.UTF_8);
                         LOGGER.info("GENERATE BROWSERSTACK REPORT " + jsonTxt + "parseStoredBuildResult Passes");
                         // JsonParser jsonParser = new JsonParser();
-                        // JSONArray jsonarray = new JSONArray(jsonTxt);
+                        // try {  
+                        //     JSONArray jsonarray = new JSONArray(jsonTxt);
+                        //     LOGGER.info("GENERATE BROWSERSTACK REPORT " + jsonarray + "parseStoredBuildResult jsonarray");
+                        // } catch (Exception e) {
+                        //     // TODO: handle exception
+                        // }
                         JSONObject jsonObject = new JSONObject(jsonTxt);
                         LOGGER.info("GENERATE BROWSERSTACK REPORT " + jsonObject + "parseStoredBuildResult jsonObject");
                         LOGGER.info("GENERATE BROWSERSTACK REPORT " + jsonObject.get("results") + "parseStoredBuildResult jsonObject");
-                        // for (int i = 0; i < jsonarray.length(); i++) {
-                        //     JSONObject jsonobject = jsonarray.getJSONObject(i);
-                        //     String name = jsonobject.getString("name");
-                        //     String url = jsonobject.getString("url");
-                        // }
-                        List<JSONObject> parsedResult = (List<JSONObject>) jsonObject.get("results");
-
+                        JSONArray parsedResult = (JSONArray) jsonObject.get("results");
+                        
+                        for (int i = 0; i < parsedResult.length(); i++) {
+                            JSONObject jsonobject = parsedResult.getJSONObject(i);
+                            bstackResultList.add(jsonobject);
+                        }
                         LOGGER.info("GENERATE BROWSERSTACK REPORT " + parsedResult + "parseStoredBuildResult Passes");
                         LOGGER.info("GENERATE BROWSERSTACK REPORT " + bstackResultList.toString() + "parseStoredBuildResult Passes Here");
-                        bstackResultList.addAll(parsedResult);
                         is.close();
                         // readStream.close();
                         return bstackResultList;
