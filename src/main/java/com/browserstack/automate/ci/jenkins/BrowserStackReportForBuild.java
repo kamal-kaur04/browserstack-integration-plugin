@@ -12,15 +12,14 @@ import com.browserstack.client.BrowserStackClient;
 import com.browserstack.client.exception.BrowserStackException;
 
 import hudson.FilePath;
-import hudson.model.Action;
 import hudson.model.Run;
-import hudson.tasks.test.TestResult;
 import org.json.JSONObject;
 
 import javax.annotation.Nonnull;
 
+import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.InputStream;
+import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.io.PrintStream;
 import java.text.ParseException;
@@ -244,20 +243,44 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
     private List<JSONObject> parseStoredBuildResult(Run<?, ?> build) {
         List<JSONObject> bstackResultList = new ArrayList<>(); 
         try {
-            File bstackDir = new File(build.getRootDir(), "browserstack-reports");
-            if (bstackDir.exists()) {
-                FilePath bstackReport = new FilePath(new File(bstackDir.getAbsolutePath(), "buildResults.json"));
-                if (bstackReport.exists()) {
-                    InputStream inputStr = bstackReport.read();
-                    ObjectInputStream readStream = new ObjectInputStream(inputStr);
-                    List<JSONObject> parsedResult = (List<JSONObject>) readStream.readObject();
-                    bstackResultList.addAll(parsedResult);
-                    readStream.close();
-                    return bstackResultList;
+            FilePath bstackDir = Tools.getBrowserStackReportDir(owner, "browserstack-reports");
+            FilePath[] paths = null;
+
+            try {
+                paths = bstackDir.list("buildResults*.json");
+            } catch (Exception e) {
+                // do nothing
+            }
+
+            if (paths != null) {
+                for (FilePath path : paths) {
+                    File file = new File(path.getRemote());
+                    
+                    if (!file.isFile()) {
+                        continue; // move to next file
+                    } else {
+                    }
+
+                    BufferedInputStream bufferedInputStream = null;
+
+                    try {
+                        bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
+                        ObjectInputStream readStream = new ObjectInputStream(bufferedInputStream);
+                        List<JSONObject> parsedResult = (List<JSONObject>) readStream.readObject();
+                        LOGGER.info("GENERATE BROWSERSTACK REPORT " + parsedResult + "parseStoredBuildResult Passes");
+                        bstackResultList.addAll(parsedResult);
+                        LOGGER.info("GENERATE BROWSERSTACK REPORT " + bstackResultList.toString() + "parseStoredBuildResult Passes");
+                        readStream.close();
+                        return bstackResultList;
+                    } catch (Exception e) {
+                        // TODO: handle exception
+                    }
                 }
             }
             return bstackResultList;
+            
         } catch (Exception e) {
+            e.printStackTrace();
             LOGGER.info("GENERATE BROWSERSTACK REPORT " + e + "parseStoredBuildResult");
             return bstackResultList;
         }
