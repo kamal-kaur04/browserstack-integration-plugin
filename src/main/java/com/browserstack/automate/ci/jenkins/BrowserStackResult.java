@@ -2,6 +2,8 @@ package com.browserstack.automate.ci.jenkins;
 
 import java.util.List;
 import java.util.Map;
+
+import hudson.model.Run;
 import org.json.JSONObject;
 
 import com.browserstack.automate.ci.common.constants.Constants;
@@ -9,6 +11,8 @@ import hudson.tasks.test.TestObject;
 import hudson.tasks.test.TestResult;
 
 public class BrowserStackResult extends TestResult {
+    // owner of this build
+    protected Run<?, ?> run;
     private transient List<JSONObject> result;
     private Map<String, String> resultAggregation;
 
@@ -41,5 +45,14 @@ public class BrowserStackResult extends TestResult {
     @Override
     public String getDisplayName() {
         return Constants.BROWSERSTACK_REPORT_DISPLAY_NAME;
+    }
+
+    @Override
+    public Run<?, ?> getRun() {
+        return run;
+    }
+
+    public void setRun(Run<?, ?> run) {
+        this.run = run;
     }
 }

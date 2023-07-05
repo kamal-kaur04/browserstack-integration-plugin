@@ -264,6 +264,7 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
     public TestResult getResult() {
         LOGGER.info(String.format("I'm here, trying to find results %s", result));
         BrowserStackResult bstackResult = new BrowserStackResult(result, resultAggregation);
+        bstackResult.setRun(getBuild());
         if (result == null) {
             LOGGER.info("The result size is null");
             List<JSONObject> resultList = parseStoredBuildResult(super.run);
@@ -273,6 +274,7 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
                 generateAggregationInfo();
                 LOGGER.info(String.format("Aggregated Report Generated %s", resultList));
                 bstackResult = new BrowserStackResult(resultList, resultAggregation);
+                bstackResult.setRun(super.run);
             }
         }
         return bstackResult;
