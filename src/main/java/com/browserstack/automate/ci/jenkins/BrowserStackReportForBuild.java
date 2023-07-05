@@ -10,8 +10,6 @@ import com.browserstack.automate.model.Build;
 import com.browserstack.automate.model.Session;
 import com.browserstack.client.BrowserStackClient;
 import com.browserstack.client.exception.BrowserStackException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import hudson.FilePath;
@@ -23,11 +21,10 @@ import org.json.JSONObject;
 
 import javax.annotation.Nonnull;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
@@ -171,6 +168,7 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
 
         sessionJSON.put(Constants.SessionInfo.BROWSERSTACK_BUILD_NAME, buildName);
         sessionJSON.put(Constants.SessionInfo.BROWSERSTACK_BUILD_URL, browserStackBuildBrowserUrl);
+        sessionJSON.put(Constants.SessionInfo.BROWSERSTACK_BUILD_DURATION, browserStackBuild.getDuration());
 
         if (session.getDevice() == null || session.getDevice().isEmpty()) {
             sessionJSON.put(Constants.SessionInfo.BROWSER, session.getBrowser());
@@ -223,7 +221,11 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
 
         resultAggregation.put("totalSessions", String.valueOf(totalSessions));
         resultAggregation.put("totalErrors", String.valueOf(totalErrors));
-        resultAggregation.put("buildDuration", Tools.durationToHumanReadable(browserStackBuild.getDuration()));
+        if (browserStackBuild == null && result.get(0).get(Constants.SessionInfo.BROWSERSTACK_BUILD_DURATION) != null) {
+            resultAggregation.put("buildDuration", Tools.durationToHumanReadable(Long.parseLong(String.valueOf(result.get(0).get(Constants.SessionInfo.BROWSERSTACK_BUILD_DURATION)))));
+        } else {
+            resultAggregation.put("buildDuration", Tools.durationToHumanReadable(browserStackBuild.getDuration()));
+        }
     }
 
     private String fetchBuildInfo(List<JSONObject> resultList) {
@@ -347,6 +349,11 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
             } catch (Exception e) {
                 LOGGER.info(String.format("Exception in getResult %s", e));
             }
+        }
+        try {
+            super.run.save();
+        } catch (IOException e) {
+            LOGGER.info(String.format("Saving Results Exception in getResult %s", e));
         }
         return bstackResult;
     }
