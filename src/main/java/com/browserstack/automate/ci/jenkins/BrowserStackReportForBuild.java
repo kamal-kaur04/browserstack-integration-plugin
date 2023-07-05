@@ -221,11 +221,11 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
 
         resultAggregation.put("totalSessions", String.valueOf(totalSessions));
         resultAggregation.put("totalErrors", String.valueOf(totalErrors));
-        if (browserStackBuild == null && result.get(0).get(Constants.SessionInfo.BROWSERSTACK_BUILD_DURATION) != null) {
-            resultAggregation.put("buildDuration", Tools.durationToHumanReadable(Long.parseLong(String.valueOf(result.get(0).get(Constants.SessionInfo.BROWSERSTACK_BUILD_DURATION)))));
-        } else {
+        // if (browserStackBuild == null && result.get(0).get(Constants.SessionInfo.BROWSERSTACK_BUILD_DURATION) != null) {
+        //     resultAggregation.put("buildDuration", Tools.durationToHumanReadable(Long.parseLong(String.valueOf(result.get(0).get(Constants.SessionInfo.BROWSERSTACK_BUILD_DURATION)))));
+        // } else {
             resultAggregation.put("buildDuration", Tools.durationToHumanReadable(browserStackBuild.getDuration()));
-        }
+        // }
     }
 
     private String fetchBuildInfo(List<JSONObject> resultList) {
