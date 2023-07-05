@@ -293,7 +293,7 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
                         //     String name = jsonobject.getString("name");
                         //     String url = jsonobject.getString("url");
                         // }
-                        List<JSONObject> parsedResult = mapper.readValue(jsonTxt, new TypeReference<List<JSONObject>>(){});
+                        List<JSONObject> parsedResult = (List<JSONObject>) jsonObject.get("results");
 
                         LOGGER.info("GENERATE BROWSERSTACK REPORT " + parsedResult + "parseStoredBuildResult Passes");
                         LOGGER.info("GENERATE BROWSERSTACK REPORT " + bstackResultList.toString() + "parseStoredBuildResult Passes Here");
