@@ -42,8 +42,8 @@ import static com.browserstack.automate.ci.common.logger.PluginLogger.logError;
 public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBuild {
     private final String buildName;
     private final transient List<Session> browserStackSessions;
-    private final transient List<JSONObject> result;
-    private final Map<String, String> resultAggregation;
+    private transient List<JSONObject> result;
+    private Map<String, String> resultAggregation;
     private final ProjectType projectType;
     private final transient PrintStream logger;
     private final String customProxy;
@@ -336,6 +336,8 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
                 if (resultList != null && resultList.size() > 0) {
                     LOGGER.info(String.format("Parse successful %s", resultList));
                     resultList.sort(new SessionsSortingComparator());
+                    result = resultList;
+                    resultAggregation = new HashMap<>();
                     generateAggregationInfo();
                     String browserstackbuildName = fetchBuildInfo(resultList);
                     LOGGER.info(String.format("Aggregated Report Generated %s", resultList));
