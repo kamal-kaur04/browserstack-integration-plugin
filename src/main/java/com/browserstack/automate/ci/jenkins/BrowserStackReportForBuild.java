@@ -10,14 +10,15 @@ import com.browserstack.automate.model.Build;
 import com.browserstack.automate.model.Session;
 import com.browserstack.client.BrowserStackClient;
 import com.browserstack.client.exception.BrowserStackException;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import hudson.FilePath;
 import hudson.model.Run;
-import net.sf.json.JSONArray;
 
 import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.annotation.Nonnull;
@@ -241,7 +242,9 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
             FilePath bstackDir = Tools.getBrowserStackReportDir(build, "browserstack-reports");
             bstackDir.mkdirs();
             FilePath dst = bstackDir.child("buildResults.json");
-            dst.write(getBrowserStackResult().toString(), null);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("results", getBrowserStackResult());
+            dst.write(jsonObject.toString(), null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -280,12 +283,21 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
                         InputStream is = new FileInputStream(file);
                         String jsonTxt = IOUtils.toString(is, StandardCharsets.UTF_8);
                         LOGGER.info("GENERATE BROWSERSTACK REPORT " + jsonTxt + "parseStoredBuildResult Passes");
+                        // JsonParser jsonParser = new JsonParser();
+                        // JSONArray jsonarray = new JSONArray(jsonTxt);
+                        JSONObject jsonObject = new JSONObject(jsonTxt);
+                        LOGGER.info("GENERATE BROWSERSTACK REPORT " + jsonObject + "parseStoredBuildResult jsonObject");
+                        LOGGER.info("GENERATE BROWSERSTACK REPORT " + jsonObject.get("results") + "parseStoredBuildResult jsonObject");
+                        // for (int i = 0; i < jsonarray.length(); i++) {
+                        //     JSONObject jsonobject = jsonarray.getJSONObject(i);
+                        //     String name = jsonobject.getString("name");
+                        //     String url = jsonobject.getString("url");
+                        // }
                         List<JSONObject> parsedResult = mapper.readValue(jsonTxt, new TypeReference<List<JSONObject>>(){});
 
                         LOGGER.info("GENERATE BROWSERSTACK REPORT " + parsedResult + "parseStoredBuildResult Passes");
-                        LOGGER.info("GENERATE BROWSERSTACK REPORT " + parsedResult.toString() + "parseStoredBuildResult Passes");
+                        LOGGER.info("GENERATE BROWSERSTACK REPORT " + bstackResultList.toString() + "parseStoredBuildResult Passes Here");
                         bstackResultList.addAll(parsedResult);
-                        LOGGER.info("GENERATE BROWSERSTACK REPORT " + bstackResultList.toString() + "parseStoredBuildResult Passes");
                         is.close();
                         // readStream.close();
                         return bstackResultList;
