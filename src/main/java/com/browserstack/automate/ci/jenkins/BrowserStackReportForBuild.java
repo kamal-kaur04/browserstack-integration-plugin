@@ -282,7 +282,6 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
                         inputStream.close();
                         return bstackResultList;
                     } catch (Exception e) {
-                        e.printStackTrace();
                         LOGGER.warning(String.format("Converting BrowserStack Results to Text failed - %s", Tools.getStackTraceAsString(e)));
                     }
                 }

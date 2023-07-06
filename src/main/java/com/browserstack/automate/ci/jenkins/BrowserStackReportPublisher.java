@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 import static com.browserstack.automate.ci.common.logger.PluginLogger.log;
 
 public class BrowserStackReportPublisher extends Recorder implements SimpleBuildStep {
-    private static final Logger LOGGER = Logger.getLogger(BrowserStackReportForBuild.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(BrowserStackReportPublisher.class.getName());
 
     @DataBoundConstructor
     public BrowserStackReportPublisher() {
