@@ -72,7 +72,7 @@ public class BrowserStackReportPublisher extends Recorder implements SimpleBuild
         ArtifactArchiver artifactArchiver = new ArtifactArchiver(Constants.BROWSERSTACK_REPORT_PATH_PATTERN);
         artifactArchiver.setAllowEmptyArchive(true);
         artifactArchiver.perform(build, workspace, parentEnvs, launcher, listener);
-        LOGGER.info(String.format("Succesfully archived artifacts for pattern %s - %s", Constants.BROWSERSTACK_REPORT_PATH_PATTERN, artifactArchiver.getArtifacts()));
+        LOGGER.info(String.format("Succesfully archived artifacts for pattern %s", artifactArchiver.getArtifacts()));
 
         tracker.reportGenerationCompleted(reportStatus, product.name(), pipelineStatus,
                 browserStackBuildName, bstackReportAction.getBrowserStackBuildID());
