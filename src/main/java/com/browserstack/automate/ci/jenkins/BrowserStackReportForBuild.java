@@ -10,7 +10,6 @@ import com.browserstack.automate.model.Build;
 import com.browserstack.automate.model.Session;
 import com.browserstack.client.BrowserStackClient;
 import com.browserstack.client.exception.BrowserStackException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import hudson.FilePath;
 import hudson.model.Run;
@@ -33,7 +32,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
-import static com.browserstack.automate.ci.common.logger.PluginLogger.log;
 import static com.browserstack.automate.ci.common.logger.PluginLogger.logError;
 
 public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBuild {
@@ -72,7 +70,6 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
         this.tracker = tracker;
         this.pipelineStatus = pipelineStatus;
         fetchBuildAndSessions();
-        LOGGER.info("Is it coming here multiple time ??");
     }
 
     private void fetchBuildAndSessions() {
@@ -112,7 +109,6 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
     }
 
     public boolean generateBrowserStackReport() {
-        LOGGER.info("GENERATE BROWSERSTACK REPORT");
         if (result.size() == 0) {
             result.addAll(generateSessionsCollection(browserStackSessions));
 
@@ -239,16 +235,14 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
     }
 
     private void writeBuildResultToFile(Run<?, ?> build) {
+        LOGGER.info("Writing Build results to File");
         try {
-            log(logger, getBrowserStackResult().toString());
             FilePath bstackDir = Tools.getBrowserStackReportDir(build, "browserstack-reports");
             bstackDir.mkdirs();
-            FilePath dst = bstackDir.child("buildResults.json");
-            // JSONObject jsonObject = new JSONObject();
-            // jsonObject.put("results", getBrowserStackResult());
-            dst.write(getBrowserStackResult().toString(), null);
+            FilePath dstFile = bstackDir.child("buildResults.json");
+            dstFile.write(getBrowserStackResult().toString(), null);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.warning(String.format("Write Build result to File Failed - %s", Tools.getStackTraceAsString(e)));
         }
     }
 
@@ -257,21 +251,16 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
         try {
             FilePath bstackDir = Tools.getBrowserStackReportDir(build, "browserstack-reports");
             FilePath[] paths = null;
-            LOGGER.info("bstackDir " + bstackDir);
 
             try {
                 paths = bstackDir.list("buildResults*.json");
-                LOGGER.info("paths " + paths.toString());
             } catch (Exception e) {
-                e.printStackTrace();
-                LOGGER.info("GENERATE BROWSERSTACK REPORT " + e + "bstackDir list");
+                // do nothing
             }
 
             if (paths != null) {
                 for (FilePath path : paths) {
-                    LOGGER.info("path " + path);
                     File file = new File(path.getRemote());
-                    LOGGER.info("File Path " + file.getAbsolutePath() + file.isFile());
                     
                     if (!file.isFile()) {
                         continue; // move to next file
@@ -279,32 +268,28 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
                     }
 
                     try {
-                        InputStream is = new FileInputStream(file);
-                        String jsonTxt = IOUtils.toString(is, StandardCharsets.UTF_8);
+                        InputStream inputStream = new FileInputStream(file);
+                        String jsonArrayTxt = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
                         try {  
-                            JSONArray parsedResult = new JSONArray(jsonTxt);
-                            LOGGER.info("GENERATE BROWSERSTACK REPORT " + parsedResult + "parseStoredBuildResult jsonarray");
+                            JSONArray parsedResult = new JSONArray(jsonArrayTxt);
                             for (int i = 0; i < parsedResult.length(); i++) {
                                 JSONObject jsonobject = parsedResult.getJSONObject(i);
                                 bstackResultList.add(jsonobject);
                             }
                         } catch (Exception e) {
-                            LOGGER.info("GENERATE BROWSERSTACK REPORT " + e + "parseStoredBuildResult jsonarray");
+                            LOGGER.warning(String.format("Reading BrowserStack Results from file failed - %s", Tools.getStackTraceAsString(e)));
                         }
-                        is.close();
-                        LOGGER.info("GENERATE BROWSERSTACK REPORT " + bstackResultList + "parseStoredBuildResult Passes");
+                        inputStream.close();
                         return bstackResultList;
                     } catch (Exception e) {
                         e.printStackTrace();
-                        LOGGER.info("GENERATE BROWSERSTACK REPORT " + e + "bufferedInputStream");
+                        LOGGER.warning(String.format("Converting BrowserStack Results to Text failed - %s", Tools.getStackTraceAsString(e)));
                     }
                 }
             }
             return bstackResultList;
-            
         } catch (Exception e) {
-            e.printStackTrace();
-            LOGGER.info("GENERATE BROWSERSTACK REPORT " + e + "parseStoredBuildResult");
+            LOGGER.warning(String.format("Parse stored build result %s", Tools.getStackTraceAsString(e)));
             return bstackResultList;
         }
     }
@@ -321,32 +306,28 @@ public class BrowserStackReportForBuild extends AbstractBrowserStackReportForBui
 
     @Override
     public BrowserStackResult getResult() {
-        LOGGER.info(String.format("I'm here, trying to find results %s", result));
         BrowserStackResult bstackResult = new BrowserStackResult(buildName, browserStackBuildBrowserUrl, result, resultAggregation);
         bstackResult.setRun(getBuild());
         if (result == null) {
-            LOGGER.info("The result size is null");
             List<JSONObject> resultList = parseStoredBuildResult(super.run);
             try {
                 if (resultList != null && resultList.size() > 0) {
-                    LOGGER.info(String.format("Parse successful %s", resultList));
+                    LOGGER.fine(String.format("Parse successful %s", resultList));
                     result = resultList;
                     resultAggregation = new HashMap<>();
                     generateAggregationInfo();
                     String browserstackbuildName = fetchBuildInfo(resultList);
-                    LOGGER.info(String.format("Aggregated Report Generated %s", resultList));
                     bstackResult = new BrowserStackResult(browserstackbuildName, browserStackBuildBrowserUrl, resultList, resultAggregation);
                     bstackResult.setRun(super.run);
                 }
             } catch (Exception e) {
-                LOGGER.info(String.format("Exception in getResult %s", e));
-                LOGGER.info(String.format("Something went wrong - %s", Tools.getStackTraceAsString(e)));
+                LOGGER.warning(String.format("Fetching results failed - %s", Tools.getStackTraceAsString(e)));
             }
         }
         try {
             super.run.save();
         } catch (IOException e) {
-            LOGGER.info(String.format("Saving Results Exception in getResult %s", e));
+            // do nothing
         }
         return bstackResult;
     }

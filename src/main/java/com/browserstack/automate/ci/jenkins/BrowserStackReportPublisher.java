@@ -68,11 +68,12 @@ public class BrowserStackReportPublisher extends Recorder implements SimpleBuild
         String reportStatus = reportResult ? Constants.ReportStatus.SUCCESS : Constants.ReportStatus.FAILED;
         log(logger, "BrowserStack Report Status: " + reportStatus);
 
-        LOGGER.info("Archiving artifacts at **/browserstack-artifacts/*");
-        ArtifactArchiver artifactArchiver = new ArtifactArchiver("**/browserstack-artifacts/*");
+        LOGGER.info(String.format("Archiving artifacts for pattern %s", Constants.BROWSERSTACK_REPORT_PATH_PATTERN));
+        ArtifactArchiver artifactArchiver = new ArtifactArchiver(Constants.BROWSERSTACK_REPORT_PATH_PATTERN);
+        artifactArchiver.setAllowEmptyArchive(true);
         artifactArchiver.perform(build, workspace, parentEnvs, launcher, listener);
-        LOGGER.info("Succesfully archived artifacts at **/browserstack-artifacts/*" + artifactArchiver.getArtifacts());
-        
+        LOGGER.info(String.format("Succesfully archived artifacts for pattern %s - %s", Constants.BROWSERSTACK_REPORT_PATH_PATTERN, artifactArchiver.getArtifacts()));
+
         tracker.reportGenerationCompleted(reportStatus, product.name(), pipelineStatus,
                 browserStackBuildName, bstackReportAction.getBrowserStackBuildID());
     }

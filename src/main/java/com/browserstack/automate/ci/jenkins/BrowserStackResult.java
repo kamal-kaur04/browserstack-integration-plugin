@@ -15,7 +15,7 @@ public class BrowserStackResult extends TestResult {
     protected Run<?, ?> build;
     private String buildName;
     private String browserStackBuildBrowserUrl;
-    private final transient List<JSONObject> result;
+    private final transient List<JSONObject> buildResult;
     private final Map<String, String> resultAggregation;
     private final String errorConst = Constants.SessionStatus.ERROR;
     private final String failedConst = Constants.SessionStatus.FAILED;
@@ -23,7 +23,7 @@ public class BrowserStackResult extends TestResult {
     public BrowserStackResult(String buildName, String browserStackBuildBrowserUrl, List<JSONObject> resultList, Map<String, String> resultAggregation) {
         this.buildName = buildName;
         this.browserStackBuildBrowserUrl = browserStackBuildBrowserUrl;
-        this.result = resultList;
+        this.buildResult = resultList;
         this.resultAggregation = resultAggregation;
     }
     
@@ -51,7 +51,7 @@ public class BrowserStackResult extends TestResult {
     }
 
     public List<JSONObject> getResult() {
-        return result;
+        return buildResult;
     }
     
     public Map<String, String> getResultAggregation() {
@@ -68,5 +68,13 @@ public class BrowserStackResult extends TestResult {
 
     public void setRun(Run<?, ?> build) {
         this.build = build;
+    }
+
+    public String getBuildName() {
+        return buildName;
+    }
+
+    public String getBrowserStackBuildBrowserUrl() {
+        return browserStackBuildBrowserUrl;
     }
 }
